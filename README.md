@@ -1,49 +1,67 @@
-Perfect 🚀 — let’s build you a ready-to-run LEMP project on Ubuntu 24.04, where:
+# 🚀 LEMP Project with AWS RDS (Ubuntu 24.04 + Nginx + PHP-FPM + RDS MySQL/MariaDB)
 
-Server → Ubuntu 24.04 at 13.234.29.239
+This project demonstrates how to deploy a **LEMP stack** on Ubuntu 24.04 with:
+- **Linux (Ubuntu 24.04)**
+- **Nginx** (web server)
+- **PHP-FPM** (PHP runtime)
+- **AWS RDS (MariaDB/MySQL)** (database)
 
-Web server → Nginx + PHP-FPM
+It provides a simple PHP app that:
+- Connects to AWS RDS
+- Inserts user data
+- Displays users from the database
 
-Database → AWS RDS (MariaDB/MySQL)
+---
 
-App → Simple PHP project that inserts and displays data from your RDS database
+## 🛠️ Setup Instructions
 
-📦 Project Setup (Step by Step)
-1. Install Dependencies on Ubuntu
+### 1. Connect to Ubuntu Server
+SSH into your EC2 instance:
+```bash
+ssh ubuntu@<your-public-ip>
+```
 
-SSH into your server:
-
-ssh ubuntu@13.234.29.239
-
-Then install Nginx, PHP-FPM, and MySQL extension:
-
+Update the system:
+```bash
 sudo apt update && sudo apt upgrade -y
+```
+
+---
+
+### 2. Install Dependencies
+Install Nginx, PHP-FPM, and MySQL extension:
+```bash
 sudo apt install nginx php-fpm php-mysql -y
+```
 
-2. Project Directory
+---
 
-Create your app folder:
-
+### 3. Project Directory
+Create project folder:
+```bash
 sudo mkdir -p /var/www/lemp-project
 sudo chown -R $USER:$USER /var/www/lemp-project
-sudo cd  /var/www/lemp-project
+cd /var/www/lemp-project
+```
 
-3. Project Files
-config.php
+---
 
-Edit with your AWS RDS endpoint, user, password, and DB:
+### 4. Application Files
 
+#### `config.php`
+```php
 <?php
-$host = "<aws-rds-server>"; // your RDS endpoint
-$port = "3306";                                     // default RDS port
-$db   = "myapp";                                    // database name
-$user = "admin";                                    // RDS username
-$pass = "<mysql-password>";                               // RDS password
+$host = "<aws-rds-endpoint>"; // e.g. mydb.xxxxxx.ap-south-1.rds.amazonaws.com
+$port = "3306";               // default RDS port
+$db   = "myapp";              // database name
+$user = "admin";              // RDS username
+$pass = "<mysql-password>";   // RDS password
 
 $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
+```
 
-index.php
-
+#### `index.php`
+```php
 <?php
 require 'config.php';
 
@@ -53,7 +71,7 @@ try {
 
     echo "<h1>✅ Connected to AWS RDS from Ubuntu 24.04 LEMP</h1>";
 
-    // Insert sample data
+    // Insert new user
     if (isset($_POST['name']) && !empty($_POST['name'])) {
         $stmt = $pdo->prepare("INSERT INTO users (name) VALUES (?)");
         $stmt->execute([$_POST['name']]);
@@ -78,11 +96,13 @@ try {
     <input type="text" name="name" placeholder="Enter name" required>
     <button type="submit">Add User</button>
 </form>
+```
 
-4. AWS RDS Setup
+---
 
-Log in to your RDS (via MySQL client or AWS console query editor) and run:
-
+### 5. AWS RDS Setup
+Login to your RDS DB and run:
+```sql
 CREATE DATABASE myapp;
 USE myapp;
 
@@ -92,18 +112,21 @@ CREATE TABLE users (
 );
 
 INSERT INTO users (name) VALUES ('Rock'), ('LEMP Test User');
+```
 
-5. Nginx Configuration
+---
 
-Create new config:
-
+### 6. Nginx Configuration
+Create a new server block:
+```bash
 sudo nano /etc/nginx/sites-available/lemp-project
+```
 
 Paste:
-
+```nginx
 server {
     listen 80;
-    server_name <public-ip-address>; # enter your public address
+    server_name <your-public-ip>;
 
     root /var/www/lemp-project;
     index index.php index.html;
@@ -114,7 +137,7 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;   # check version with: ls /var/run/php/
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock; # adjust if version differs
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         include fastcgi_params;
     }
@@ -123,25 +146,51 @@ server {
         deny all;
     }
 }
+```
 
 Enable the site:
-
+```bash
 sudo ln -s /etc/nginx/sites-available/lemp-project /etc/nginx/sites-enabled/
 sudo rm /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl reload nginx
+```
 
-6. Test
+---
 
-Go to your browser:
-http:<public-ip-address>
+### 7. Test in Browser
+Visit:
+```
+http://<your-public-ip>
+```
 
-You’ll see connection success
-Users list will load from RDS
-You can insert new users with the form
+- You should see **connection success** 🎉  
+- Existing users loaded from RDS  
+- You can insert new users using the form  
 
-✅ This gives you a fully working LEMP project with AWS RDS:
+---
 
-index.php → Insert & display data
-config.php → Stores DB connection details
-Nginx serves the app on your server IP
+## ✅ Features
+- PHP-FPM handles PHP scripts
+- Nginx serves the app
+- AWS RDS as external DB
+- Insert + display users dynamically
+
+---
+
+## 🔒 Next Steps (Optional)
+- Use a **domain name** instead of raw IP  
+- Add **SSL/TLS** with Let’s Encrypt  
+- Secure config files (`config.php`)  
+- Use **environment variables** for secrets  
+
+---
+
+## 📸 Demo Screenshot (Optional)
+*(Add your screenshot here after testing on browser)*
+
+---
+
+## 👨‍💻 Author
+**Abhay Bendekar**  
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/abhay-bendekar-75474b372/)
