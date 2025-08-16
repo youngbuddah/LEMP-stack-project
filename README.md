@@ -176,18 +176,10 @@ http://<your-public-ip>
 - AWS RDS as external DB
 - Insert + display users dynamically
 
----
 
-## 🔒 Next Steps (Optional)
-- Use a **domain name** instead of raw IP  
-- Add **SSL/TLS** with Let’s Encrypt  
-- Secure config files (`config.php`)  
-- Use **environment variables** for secrets  
+## 📸 Demo Screenshot 
+![Demo Screenshot](https://github.com/youngbuddah/LEMP-stack-project/blob/main/Screenshot%20from%202025-08-16%2022-55-12.png)
 
----
-
-## 📸 Demo Screenshot (Optional)
-*(Add your screenshot here after testing on browser)*
 
 ---
 
